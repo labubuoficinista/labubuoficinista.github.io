@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 1 — Heavy</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f0e0c;
+    --card: #1a1815;
+    --accent: #e8c87a;
+    --accent2: #c97a5a;
+    --muted: #5a5650;
+    --text: #f0ebe2;
+    --sub: #a09890;
+    --rest-bg: #1f2820;
+    --rest-color: #7ab87a;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--bg); color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh; padding: 28px 18px 60px;
+    max-width: 480px; margin: 0 auto;
+  }
+  .header { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 28px; border-bottom: 1px solid #2a2722; padding-bottom: 18px; }
+  .day-label { font-family: 'Bebas Neue', sans-serif; font-size: 52px; line-height: 1; color: var(--accent); letter-spacing: 2px; }
+  .day-sub { font-size: 11px; color: var(--muted); letter-spacing: 3px; text-transform: uppercase; margin-bottom: 4px; }
+  .badge-heavy { background: var(--accent2); color: #fff; font-size: 10px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; padding: 4px 10px; border-radius: 2px; }
+  .phase { display: flex; align-items: center; gap: 10px; margin: 22px 0 12px; }
+  .phase-num { font-family: 'Bebas Neue', sans-serif; font-size: 28px; color: var(--accent); line-height: 1; }
+  .phase-title { font-size: 11px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; color: var(--sub); }
+  .phase-time { margin-left: auto; font-size: 11px; color: var(--muted); background: #232018; padding: 3px 9px; border-radius: 20px; letter-spacing: 1px; }
+  .ex-row {
+    display: flex; align-items: center; background: var(--card);
+    border-radius: 10px; padding: 13px 15px; margin-bottom: 7px; gap: 12px;
+    border-left: 3px solid transparent; cursor: pointer;
+    transition: border-color 0.2s, background 0.15s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .ex-row:hover, .ex-row:active { border-left-color: var(--accent); background: #201e19; }
+  .ex-index { font-family: 'Bebas Neue', sans-serif; font-size: 16px; color: var(--muted); width: 16px; flex-shrink: 0; text-align: center; }
+  .ex-name { font-size: 15px; font-weight: 500; flex: 1; color: var(--text); }
+  .ex-meta { display: flex; gap: 7px; align-items: center; flex-shrink: 0; }
+  .pill { font-size: 12px; font-weight: 600; background: #232018; color: var(--accent); border-radius: 5px; padding: 3px 8px; white-space: nowrap; }
+  .pill.sides { color: var(--sub); font-weight: 400; }
+  .pill.hold { color: #8abccc; }
+  .main-card { background: var(--card); border-radius: 12px; margin-bottom: 10px; overflow: hidden; cursor: pointer; transition: background 0.15s; -webkit-tap-highlight-color: transparent; }
+  .main-card:hover, .main-card:active { background: #201e19; }
+  .main-card-header { display: flex; align-items: center; padding: 14px 16px 10px; gap: 12px; }
+  .letter-badge { font-family: 'Bebas Neue', sans-serif; font-size: 26px; line-height: 1; width: 32px; text-align: center; flex-shrink: 0; }
+  .letter-badge.a { color: var(--accent); }
+  .letter-badge.b { color: #cc9c6a; }
+  .letter-badge.c { color: var(--accent2); }
+  .letter-badge.d { color: #8abccc; }
+  .main-name { font-size: 17px; font-weight: 600; flex: 1; }
+  .priority-tag { font-size: 9px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; padding: 3px 8px; border-radius: 2px; }
+  .priority-tag.p1 { background: #2e2810; color: var(--accent); }
+  .priority-tag.p2 { background: #2a1e12; color: #cc9c6a; }
+  .priority-tag.p3 { background: #2a1510; color: var(--accent2); }
+  .priority-tag.p4 { background: #10202a; color: #8abccc; }
+  .main-stats { display: flex; padding: 0 16px 14px; gap: 8px; }
+  .stat-box { flex: 1; background: #111009; border-radius: 8px; padding: 10px 8px; text-align: center; }
+  .stat-val { font-family: 'Bebas Neue', sans-serif; font-size: 22px; color: var(--text); line-height: 1; }
+  .stat-lbl { font-size: 9px; color: var(--muted); text-transform: uppercase; letter-spacing: 2px; margin-top: 3px; }
+  .stat-box.heavy .stat-val { color: var(--accent); }
+  .rest-bar { display: flex; align-items: center; gap: 8px; background: var(--rest-bg); border-radius: 7px; padding: 9px 14px; margin: 0 0 10px; }
+  .rest-icon { font-size: 14px; }
+  .rest-label { font-size: 11px; color: var(--rest-color); font-weight: 600; letter-spacing: 1px; text-transform: uppercase; }
+  .rest-time { margin-left: auto; font-family: 'Bebas Neue', sans-serif; font-size: 20px; color: var(--rest-color); letter-spacing: 1px; }
+  .rest-divider { display: flex; align-items: center; gap: 8px; padding: 6px 8px; margin-bottom: 6px; }
+  .rest-divider-line { flex: 1; height: 1px; background: #1f2820; }
+  .rest-divider-text { font-size: 10px; color: var(--rest-color); font-weight: 600; letter-spacing: 2px; text-transform: uppercase; background: var(--rest-bg); border-radius: 20px; padding: 3px 10px; }
+  .cooldown-row { display: flex; align-items: center; background: var(--card); border-radius: 10px; padding: 12px 15px; margin-bottom: 7px; gap: 12px; cursor: pointer; transition: background 0.15s; -webkit-tap-highlight-color: transparent; }
+  .cooldown-row:hover, .cooldown-row:active { background: #201e19; }
+  .cd-name { font-size: 15px; font-weight: 500; flex: 1; }
+  .cd-time { font-family: 'Bebas Neue', sans-serif; font-size: 18px; color: #8abccc; }
+  .divider { height: 1px; background: #1e1c18; margin: 8px 0 18px; }
+  .prog-note { background: #17140f; border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 12px 14px; margin-top: 8px; }
+  .prog-note-title { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); margin-bottom: 7px; }
+  .prog-row { display: flex; justify-content: space-between; align-items: center; padding: 5px 0; border-bottom: 1px solid #1e1c18; font-size: 13px; }
+  .prog-row:last-child { border-bottom: none; }
+  .prog-ex { color: var(--sub); }
+  .prog-rule { color: var(--text); font-size: 12px; }
+  .low-energy { display: flex; align-items: flex-start; gap: 10px; background: #1a1018; border-radius: 8px; padding: 12px 14px; margin-top: 10px; }
+  .low-energy-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+  .low-energy-text { font-size: 12px; color: var(--sub); line-height: 1.6; }
+  .low-energy-text strong { color: var(--accent2); }
+  .tap-hint-global { text-align: center; font-size: 10px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 14px; }
+
+  /* MODAL */
+  .modal-overlay {
+    position: fixed; inset: 0; z-index: 1000;
+    background: rgba(0,0,0,0.85);
+    display: flex; align-items: flex-end; justify-content: center;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.25s ease;
+    backdrop-filter: blur(4px);
+  }
+  .modal-overlay.open { opacity: 1; pointer-events: all; }
+  .modal {
+    background: #1a1815; border-radius: 20px 20px 0 0;
+    width: 100%; max-width: 480px; padding: 20px 20px 40px;
+    transform: translateY(30px);
+    transition: transform 0.3s cubic-bezier(0.34, 1.3, 0.64, 1);
+    max-height: 80vh; overflow-y: auto;
+  }
+  .modal-overlay.open .modal { transform: translateY(0); }
+  .modal-handle { width: 40px; height: 4px; background: #3a3630; border-radius: 2px; margin: 0 auto 18px; }
+  .modal-title { font-family: 'Bebas Neue', sans-serif; font-size: 28px; color: var(--accent); letter-spacing: 1px; margin-bottom: 14px; text-align: center; }
+  .modal-img-wrap {
+    width: 100%; border-radius: 12px; overflow: hidden;
+    background: #111009; min-height: 200px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 14px;
+  }
+  .modal-img-wrap img { width: 100%; max-height: 300px; object-fit: cover; border-radius: 12px; display: block; }
+  .modal-loading { display: flex; flex-direction: column; align-items: center; gap: 10px; color: var(--muted); font-size: 13px; padding: 40px; }
+  .spinner { width: 32px; height: 32px; border: 3px solid #2a2722; border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .modal-source { font-size: 10px; color: var(--muted); text-align: center; margin-top: 6px; letter-spacing: 1px; }
+  .modal-source a { color: var(--accent); text-decoration: none; }
+  .modal-yt-link { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 12px; background: #1f1c18; border-radius: 8px; padding: 10px; text-decoration: none; color: var(--sub); font-size: 12px; font-weight: 600; letter-spacing: 1px; transition: background 0.15s; }
+  .modal-yt-link:hover { background: #2a2620; color: var(--text); }
+  .modal-close { display: block; width: 100%; margin-top: 14px; background: #232018; color: var(--sub); border: none; border-radius: 10px; padding: 13px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; letter-spacing: 1px; transition: background 0.15s; }
+  .modal-close:hover { background: #2e2a22; }
+  .modal-error { text-align: center; color: var(--muted); font-size: 13px; padding: 30px 10px; line-height: 1.8; }
+  .modal-error strong { color: var(--accent2); display: block; margin-bottom: 8px; font-size: 15px; }
+</style>
+</head>
+<body>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal" onclick="closeModalOnBg(event)">
+  <div class="modal" id="modal-inner">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="modal-title">Exercise</div>
+    <div class="modal-img-wrap" id="modal-img-wrap">
+      <div class="modal-loading"><div class="spinner"></div><span>Loading demo…</span></div>
+    </div>
+    <div class="modal-source" id="modal-source"></div>
+    <div id="modal-yt-wrap"></div>
+    <button class="modal-close" onclick="closeModal()">✕ &nbsp; Close</button>
+  </div>
+</div>
+
+<!-- HEADER -->
+<div class="header">
+  <div>
+    <div class="day-sub">Glute Focus</div>
+    <div class="day-label">Day 1</div>
+  </div>
+  <div><div class="badge-heavy">● Heavy</div></div>
+</div>
+
+<div class="tap-hint-global">👆 Tap any exercise to see a demo</div>
+
+<!-- 0. MOBILITY WARM-UP -->
+<div class="phase">
+  <div class="phase-num">0</div>
+  <div class="phase-title">Mobility Warm-Up</div>
+  <div class="phase-time">⏱ 5 min</div>
+</div>
+
+<div class="ex-row" onclick="openModal('90/90 Hip Rotations', '90/90 hip rotations mobility')">
+  <div class="ex-index">1</div>
+  <div class="ex-name">90/90 Hip Rotations</div>
+  <div class="ex-meta"><div class="pill">1×8</div><div class="pill sides">/side</div></div>
+</div>
+<div class="ex-row" onclick="openModal('Kneeling Hip Flexor Pulses', 'kneeling hip flexor pulse stretch')">
+  <div class="ex-index">2</div>
+  <div class="ex-name">Hip Flexor Pulses</div>
+  <div class="ex-meta"><div class="pill">1×10</div><div class="pill sides">/side</div></div>
+</div>
+<div class="ex-row" onclick="openModal('World\'s Greatest Stretch', 'worlds greatest stretch exercise')">
+  <div class="ex-index">3</div>
+  <div class="ex-name">World's Greatest Stretch</div>
+  <div class="ex-meta"><div class="pill">1×5</div><div class="pill sides">/side</div></div>
+</div>
+<div class="ex-row" onclick="openModal('Glute Bridge Hold', 'glute bridge hold exercise form')">
+  <div class="ex-index">4</div>
+  <div class="ex-name">Glute Bridge Hold</div>
+  <div class="ex-meta"><div class="pill">1×8</div><div class="pill hold">2s hold</div></div>
+</div>
+
+<div class="divider"></div>
+
+<!-- 1. ACTIVATION -->
+<div class="phase">
+  <div class="phase-num">1</div>
+  <div class="phase-title">Activation</div>
+  <div class="phase-time">⏱ 3–4 min</div>
+</div>
+
+<div class="ex-row" onclick="openModal('Side-Lying Clamshells', 'side lying clamshell exercise glutes')">
+  <div class="ex-index">1</div>
+  <div class="ex-name">Side-Lying Clamshells</div>
+  <div class="ex-meta"><div class="pill">1×15–20</div><div class="pill sides">/side</div></div>
+</div>
+<div class="ex-row" onclick="openModal('Glute Bridge', 'glute bridge exercise form')">
+  <div class="ex-index">2</div>
+  <div class="ex-name">Glute Bridge</div>
+  <div class="ex-meta"><div class="pill">1×12</div><div class="pill hold">2s squeeze</div></div>
+</div>
+
+<div class="divider"></div>
+
+<!-- 2. MAIN WORKOUT -->
+<div class="phase">
+  <div class="phase-num">2</div>
+  <div class="phase-title">Main Workout</div>
+</div>
+
+<div class="rest-bar">
+  <div class="rest-icon">💤</div>
+  <div class="rest-label">Rest between sets</div>
+  <div class="rest-time">A–C: 2–3 min &nbsp;·&nbsp; D: 1–2 min</div>
+</div>
+
+<div class="main-card" onclick="openModal('Barbell Hip Thrust', 'barbell hip thrust exercise form')">
+  <div class="main-card-header">
+    <div class="letter-badge a">A</div>
+    <div class="main-name">Hip Thrust</div>
+    <div class="priority-tag p1">Priority</div>
+  </div>
+  <div class="main-stats">
+    <div class="stat-box"><div class="stat-val">4</div><div class="stat-lbl">Sets</div></div>
+    <div class="stat-box"><div class="stat-val">6–10</div><div class="stat-lbl">Reps</div></div>
+    <div class="stat-box heavy"><div class="stat-val">Heavy</div><div class="stat-lbl">Load</div></div>
+  </div>
+</div>
+
+<div class="rest-divider">
+  <div class="rest-divider-line"></div>
+  <div class="rest-divider-text">Rest 2–3 min</div>
+  <div class="rest-divider-line"></div>
+</div>
+
+<div class="main-card" onclick="openModal('Romanian Deadlift', 'romanian deadlift RDL exercise form')">
+  <div class="main-card-header">
+    <div class="letter-badge b">B</div>
+    <div class="main-name">Romanian Deadlift</div>
+    <div class="priority-tag p2">Second</div>
+  </div>
+  <div class="main-stats">
+    <div class="stat-box"><div class="stat-val">2–3</div><div class="stat-lbl">Sets</div></div>
+    <div class="stat-box"><div class="stat-val">8–10</div><div class="stat-lbl">Reps</div></div>
+    <div class="stat-box"><div class="stat-val">Mod.</div><div class="stat-lbl">Load</div></div>
+  </div>
+</div>
+
+<div class="rest-divider">
+  <div class="rest-divider-line"></div>
+  <div class="rest-divider-text">Rest 2–3 min</div>
+  <div class="rest-divider-line"></div>
+</div>
+
+<div class="main-card" onclick="openModal('Bulgarian Split Squat', 'bulgarian split squat exercise form')">
+  <div class="main-card-header">
+    <div class="letter-badge c">C</div>
+    <div class="main-name">Bulgarian Split Squat</div>
+    <div class="priority-tag p3">Third</div>
+  </div>
+  <div class="main-stats">
+    <div class="stat-box"><div class="stat-val">3–4</div><div class="stat-lbl">Sets</div></div>
+    <div class="stat-box"><div class="stat-val">8–10</div><div class="stat-lbl">Reps/leg</div></div>
+    <div class="stat-box"><div class="stat-val">Mod.</div><div class="stat-lbl">Load</div></div>
+  </div>
+</div>
+
+<div class="rest-divider">
+  <div class="rest-divider-line"></div>
+  <div class="rest-divider-text">Rest 1–2 min</div>
+  <div class="rest-divider-line"></div>
+</div>
+
+<div class="main-card" onclick="openModal('Cable Hip Abduction', 'cable hip abduction exercise form')">
+  <div class="main-card-header">
+    <div class="letter-badge d">D</div>
+    <div class="main-name">Cable Hip Abduction</div>
+    <div class="priority-tag p4">Finisher</div>
+  </div>
+  <div class="main-stats">
+    <div class="stat-box"><div class="stat-val">2</div><div class="stat-lbl">Sets</div></div>
+    <div class="stat-box"><div class="stat-val">12–15</div><div class="stat-lbl">Reps/side</div></div>
+    <div class="stat-box"><div class="stat-val">Light</div><div class="stat-lbl">Load</div></div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- COOL DOWN -->
+<div class="phase">
+  <div class="phase-num">3</div>
+  <div class="phase-title">Cool Down</div>
+</div>
+
+<div class="cooldown-row" onclick="openModal('Figure-Four Stretch', 'figure four piriformis stretch')">
+  <div class="cd-name">Figure-Four Stretch</div>
+  <div class="cd-time">30s</div>
+</div>
+<div class="cooldown-row" onclick="openModal('Hip Flexor Stretch', 'kneeling hip flexor stretch')">
+  <div class="cd-name">Hip Flexor Stretch</div>
+  <div class="cd-time">40s</div>
+</div>
+<div class="cooldown-row" onclick="openModal('Seated Pigeon Pose', 'seated pigeon pose hip stretch')">
+  <div class="cd-name">Seated Pigeon</div>
+  <div class="cd-time">30s</div>
+</div>
+
+<div class="divider"></div>
+
+<!-- PROGRESSION -->
+<div class="phase">
+  <div class="phase-num">↑</div>
+  <div class="phase-title">Progression — when to add weight</div>
+</div>
+
+<div class="prog-note">
+  <div class="prog-note-title">Double Progression</div>
+  <div class="prog-row"><span class="prog-ex">Hip Thrust</span><span class="prog-rule">Hit 4×10 → add weight</span></div>
+  <div class="prog-row"><span class="prog-ex">RDL</span><span class="prog-rule">Hit 3×12 → add weight</span></div>
+  <div class="prog-row"><span class="prog-ex">Bulgarian</span><span class="prog-rule">Hit 3×10 → add weight</span></div>
+  <div class="prog-row"><span class="prog-ex">Abduction</span><span class="prog-rule">Hit 15 reps → add weight</span></div>
+</div>
+
+<div class="low-energy">
+  <div class="low-energy-icon">🌙</div>
+  <div class="low-energy-text"><strong>Low energy day?</strong> Keep the same weight — just reduce reps. Don't skip, don't crush yourself.</div>
+</div>
+
+<script>
+  const imgCache = {};
+
+  async function openModal(displayName, searchQuery) {
+    const modal = document.getElementById('modal');
+    const titleEl = document.getElementById('modal-title');
+    const wrap = document.getElementById('modal-img-wrap');
+    const srcEl = document.getElementById('modal-source');
+    const ytWrap = document.getElementById('modal-yt-wrap');
+
+    titleEl.textContent = displayName;
+    wrap.innerHTML = `<div class="modal-loading"><div class="spinner"></div><span>Finding demo…</span></div>`;
+    srcEl.innerHTML = '';
+    ytWrap.innerHTML = '';
+    modal.classList.add('open');
+    document.body.style.overflow = 'hidden';
+
+    const ytQuery = encodeURIComponent(displayName + ' exercise how to');
+    ytWrap.innerHTML = `<a class="modal-yt-link" href="https://www.youtube.com/results?search_query=${ytQuery}" target="_blank" rel="noopener">▶ Watch on YouTube</a>`;
+
+    if (imgCache[searchQuery]) {
+      renderResult(imgCache[searchQuery], searchQuery);
+      return;
+    }
+
+    try {
+      const res = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model: "claude-sonnet-4-20250514",
+          max_tokens: 1000,
+          tools: [{ type: "web_search_20250305", name: "web_search" }],
+          system: `You are a fitness image assistant. The user gives you an exercise name.
+Use web search to find a direct, publicly accessible image (JPG, PNG, or GIF) that clearly shows how to perform the exercise. 
+Prefer instructional images from fitness sites. The URL must end in .jpg, .jpeg, .png, or .gif and be a direct image link (not a page link).
+Respond ONLY with raw JSON (no markdown, no backticks, no explanation):
+{"imageUrl": "https://direct-image-url.jpg", "sourceName": "Site Name", "sourceUrl": "https://site.com"}
+If no direct image URL is found, return: {"imageUrl": null}`,
+          messages: [{ role: "user", content: `Find a direct instructional image URL for: ${searchQuery}` }]
+        })
+      });
+
+      const data = await res.json();
+      const textBlocks = (data.content || []).filter(b => b.type === 'text');
+      const raw = textBlocks.map(b => b.text).join('').trim();
+      const clean = raw.replace(/```json|```/g, '').trim();
+      const parsed = JSON.parse(clean);
+      imgCache[searchQuery] = parsed;
+      renderResult(parsed, searchQuery);
+    } catch (err) {
+      console.error(err);
+      wrap.innerHTML = `<div class="modal-error"><strong>Couldn't load image</strong>Use the YouTube link below to watch a demo video.</div>`;
+    }
+  }
+
+  function renderResult(data, searchQuery) {
+    const wrap = document.getElementById('modal-img-wrap');
+    const srcEl = document.getElementById('modal-source');
+
+    if (!data || !data.imageUrl) {
+      wrap.innerHTML = `<div class="modal-error"><strong>No image found</strong>Use the YouTube link below for a video demo.</div>`;
+      return;
+    }
+
+    const img = new Image();
+    img.src = data.imageUrl;
+    img.alt = 'Exercise demo';
+    img.style.cssText = 'width:100%;max-height:300px;object-fit:cover;border-radius:12px;display:block;';
+    img.onload = () => {
+      wrap.innerHTML = '';
+      wrap.appendChild(img);
+      if (data.sourceName && data.sourceUrl) {
+        srcEl.innerHTML = `Source: <a href="${data.sourceUrl}" target="_blank" rel="noopener">${data.sourceName}</a>`;
+      }
+    };
+    img.onerror = () => {
+      wrap.innerHTML = `<div class="modal-error"><strong>Image blocked by source</strong>Use the YouTube link below to watch the exercise.</div>`;
+    };
+  }
+
+  function closeModal() {
+    document.getElementById('modal').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  function closeModalOnBg(e) {
+    if (e.target === document.getElementById('modal')) closeModal();
+  }
+
+  const modalInner = document.getElementById('modal-inner');
+  let touchStartY = 0;
+  modalInner.addEventListener('touchstart', e => { touchStartY = e.touches[0].clientY; }, { passive: true });
+  modalInner.addEventListener('touchend', e => {
+    if (e.changedTouches[0].clientY - touchStartY > 80) closeModal();
+  });
+</script>
+</body>
+</html>
